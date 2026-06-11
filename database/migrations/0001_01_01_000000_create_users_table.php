@@ -17,6 +17,14 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            
+            // --- Custom Northern Home of Hope Columns ---
+            $table->string('phone_number')->nullable();
+            $table->string('county')->nullable();
+            $table->string('sub_county')->nullable();
+            $table->string('ward')->nullable();
+            $table->string('status')->default('active');
+
             $table->rememberToken();
             $table->timestamps();
         });

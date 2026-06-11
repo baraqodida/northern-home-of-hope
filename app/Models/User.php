@@ -21,7 +21,16 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role', // 👈 Enabled mass assignment for your new system roles
         'password',
+        
+        // --- Custom Northern Home of Hope Fields ---
+        'phone_number',
+        'county',
+        'sub_county',
+        'ward',
+        'status',
+        'group_id',
     ];
 
     /**
@@ -45,5 +54,41 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the group cluster that this member belongs to.
+     */
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    // =========================================================================
+    // --- Role-Based Access Control (RBAC) Verification Gateways ---
+    // =========================================================================
+
+    /**
+     * Check if the user is a system-wide Super Administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if the user is an assigned Group Cluster Representative/Leader.
+     */
+    public function isLeader(): bool
+    {
+        return $this->role === 'leader';
+    }
+
+    /**
+     * Check if the user is a standard organization contributor/member.
+     */
+    public function isMember(): bool
+    {
+        return $this->role === 'member';
     }
 }
