@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,44 +9,15 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
-        'email',
-        'role', // 👈 Enabled mass assignment for your new system roles
-        'password',
-        
-        // --- Custom Northern Home of Hope Fields ---
-        'phone_number',
-        'county',
-        'sub_county',
-        'ward',
-        'status',
-        'group_id',
+        'name', 'email', 'role', 'password', 
+        'phone_number', 'county', 'sub_county', 'ward', 'status', 'group_id',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -56,39 +26,24 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the group cluster that this member belongs to.
-     */
+    // --- RELATIONSHIPS ---
+
     public function group()
     {
         return $this->belongsTo(Group::class);
     }
 
-    // =========================================================================
-    // --- Role-Based Access Control (RBAC) Verification Gateways ---
-    // =========================================================================
-
     /**
-     * Check if the user is a system-wide Super Administrator.
+     * THIS WAS MISSING: This method fixes your error.
      */
-    public function isAdmin(): bool
+    public function contribution()
     {
-        return $this->role === 'admin';
+        return $this->hasOne(Contribution::class, 'user_id');
     }
 
-    /**
-     * Check if the user is an assigned Group Cluster Representative/Leader.
-     */
-    public function isLeader(): bool
-    {
-        return $this->role === 'leader';
-    }
+    // --- RBAC METHODS ---
 
-    /**
-     * Check if the user is a standard organization contributor/member.
-     */
-    public function isMember(): bool
-    {
-        return $this->role === 'member';
-    }
+    public function isAdmin(): bool { return $this->role === 'admin'; }
+    public function isLeader(): bool { return $this->role === 'leader'; }
+    public function isMember(): bool { return $this->role === 'member'; }
 }

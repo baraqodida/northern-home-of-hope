@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContributionController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MemberController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -25,15 +26,25 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('dashboard');
     });
 
+    // Dashboard & Contribution Routes
     Route::get('/dashboard', [ContributionController::class, 'index'])->name('dashboard');
+    
+    // Contributions
     Route::post('/contributions', [ContributionController::class, 'store'])->name('contributions.store');
     
-    // --- ADDED MISSING ROUTES ---
+    // Member Registration & Removal
+    Route::post('/members/store', [MemberController::class, 'storeMember'])->name('members.store');
+    Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');
+    
+    // --- UPDATED: Member Import Routes ---
+    Route::get('/imports', [MemberController::class, 'showImportForm'])->name('members.import.form');
+    Route::post('/imports', [MemberController::class, 'importMembers'])->name('members.import.submit');
+    
+    // Export Routes
     Route::get('/export/pdf', [ContributionController::class, 'exportPdf'])->name('export.pdf');
     Route::get('/export/excel', [ContributionController::class, 'exportExcel'])->name('export.excel');
-    // ----------------------------
     
-    // --- TEMPORARY CLEANUP ROUTE (Run once, then delete) ---
+    // --- TEMPORARY CLEANUP ROUTE ---
     Route::get('/cleanup-contributions', function () {
         if (!Auth::user()->isAdmin()) abort(403);
         $users = DB::table('contributions')->select('user_id')->distinct()->get();
